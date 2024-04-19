@@ -8,9 +8,17 @@ function reload() {
 }
 
 async function fetchNews(query) {
-    const res = await fetch(`${url}${query}&apiKey=${API_KEY}`);
-    const data = await res.json();
-    bindData(data.articles);
+    try {
+        const res = await fetch(`${url}${query}&apiKey=${API_KEY}`);
+        if (!res.ok) {
+            throw new Error('Failed to fetch news');
+        }
+        const data = await res.json();
+        bindData(data.articles);
+    } catch (error) {
+        console.error('Error fetching news:', error);
+        // Handle the error here, show a message to the user, or take any appropriate action
+    }
 }
 
 function bindData(articles) {
@@ -18,6 +26,12 @@ function bindData(articles) {
     const newsCardTemplate = document.getElementById("template-news-card");
 
     cardsContainer.innerHTML = "";
+
+    if (!articles) {
+        // Handle case when articles are undefined
+        console.error('Articles data is undefined');
+        return;
+    }
 
     articles.forEach((article) => {
         if (!article.urlToImage) return;
